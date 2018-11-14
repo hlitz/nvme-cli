@@ -147,8 +147,8 @@ int lnvm_do_info(void)
 }
 
 int lnvm_do_create_tgt(char *devname, char *tgtname, char *tgttype,
-					int lun_begin, int lun_end,
-					int over_prov, int flags)
+		       int lun_begin, int lun_end, int over_prov,
+		       int rail_stride_width, int flags)
 {
 	struct nvm_ioctl_create c;
 	int fd, ret;
@@ -163,11 +163,12 @@ int lnvm_do_create_tgt(char *devname, char *tgtname, char *tgttype,
 	c.flags = flags;
 
 	/* Fall back into simple IOCTL version if no extended attributes used */
-	if (over_prov != -1) {
+	if (over_prov != -1 || rail_stride_width != -1) {
 		c.conf.type = NVM_CONFIG_TYPE_EXTENDED;
 		c.conf.e.lun_begin = lun_begin;
 		c.conf.e.lun_end = lun_end;
 		c.conf.e.over_prov = over_prov;
+		c.conf.e.rail_stride_width = rail_stride_width;
 	} else {
 		c.conf.type = NVM_CONFIG_TYPE_SIMPLE;
 		c.conf.s.lun_begin = lun_begin;
